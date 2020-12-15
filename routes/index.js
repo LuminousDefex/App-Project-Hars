@@ -28,7 +28,7 @@ router.post("/", (req, res, next) => {
 });
 
 // Logout
-router.get("/", (req, res) => {
+router.get("/logout", (req, res) => {
     req.logout();
     req.flash("success_msg", "You are logged out");
     res.redirect("/");
