@@ -1,45 +1,6 @@
 const mongoose = require("mongoose");
 
 const DataSchema = new mongoose.Schema({
-    host: {
-        type: String,
-    },
-    pragma: {
-        type: String,
-    },
-    contentType: {
-        type: String,
-    },
-    cacheControl: {
-        type: String,
-    },
-    age: {
-        type: String,
-    },
-    lastModified: {
-        type: Date,
-    },
-    ip: {
-        type: String,
-    },
-    url: {
-        type: String,
-    },
-    timming: {
-        type: String,
-    },
-    date: {
-        type: Date,
-    },
-    method: {
-        type: String,
-    },
-    status: {
-        type: String,
-    },
-    statusText: {
-        type: String,
-    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
@@ -47,8 +8,48 @@ const DataSchema = new mongoose.Schema({
     uploadedAt: {
         type: Date,
         default: Date.now,
+    },
+    userJson: {
+        "Host": {
+            "type": "String"
+        },
+        "pragma": {
+            "type": "String"
+        },
+        "Content-Type": {
+            "type": "String"
+        },
+        "cache-control": {
+            "type": "String"
+        },
+        "age": {
+            "type": "String"
+        },
+        "Last-Modified": {
+            "type": "String"
+        },
+        "ip": {
+            "type": "String"
+        },
+        "url": {
+            "type": "String"
+        },
+        "timing": {
+            "type": "Number"
+        },
+        "date": {
+            "type": "Date"
+        },
+        "method": {
+            "type": "String"
+        },
+        "status": {
+            "type": "Number"
+        },
+        "statusText": {
+            "type": "String"
+        }
     }
-
 });
 
 const Data = mongoose.model("Data", DataSchema);

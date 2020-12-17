@@ -33,9 +33,13 @@ router.post("/dashboard", ensureAuthenticated, async (req, res) => {
     try {
         const { result } = req.body;
 
+        //testin json
+        jsonString = result;
+        myJson = JSON.parse(jsonString);
+        console.log(myJson[0]);
 
+        req.body.userJson = myJson[0];
         req.body.user = req.user.id;
-        req.body.testMsg = result;
         await Data.create(req.body)
         res.redirect("/dashboard")
     } catch (err) {
