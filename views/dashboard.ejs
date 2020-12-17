@@ -25,8 +25,15 @@
                     </div>
                 </div>
 
-                <textarea id="result" class="mt-1"></textarea>
+                <textarea id="result" name="result" class="mt-1"></textarea>
                 <p><a href="" class="btn btn-secondary mt-1" id="dBtn">Download</a></p>
+                <form method="POST" action="/dashboard" class="inline">
+                    <input type="hidden" name="extra_submit_param" value="extra_submit_value">
+                    <button type="submit" class="btn btn-secondary mt-1" name="submit_param" value="submit_value"
+                        class="upload-button">
+                        Upload Your Data
+                    </button>
+                </form>
             </div>
             <!--Left small collum-->
 
