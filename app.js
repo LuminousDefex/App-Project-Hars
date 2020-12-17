@@ -29,8 +29,8 @@ app.use(expressLayouts);
 app.set("view engine", "ejs")
 
 // Bodyparser
-app.use(express.urlencoded({ extended: false, limit: "500kb" }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: false, limit: "2500kb" }));
+app.use(express.json({ limit: "2500kb" }));
 
 // Express Session
 app.use(

@@ -33,21 +33,23 @@ router.post("/dashboard", ensureAuthenticated, async (req, res) => {
     try {
         const { result } = req.body;
 
-        //testin json
+        //preparing json
         jsonString = result;
         myJson = JSON.parse(jsonString);
-        console.log(myJson[0]);
-
-        req.body.userJson = myJson[0];
-        req.body.user = req.user.id;
-        await Data.create(req.body)
+        const docs = []; // {user: , userJson: {}}
+        for (let i = 0; i < myJson.length; i++) {
+            let entry = {
+                user: req.user.id,
+                userJson: myJson[i]
+            };
+            docs.push(entry);
+        }
+        await Data.create(docs)
         res.redirect("/dashboard")
     } catch (err) {
         console.error(err)
         res.render("error/500")
     }
-    //const { result } = req.body;
-    //console.log(result);
 })
 
 
