@@ -27,12 +27,24 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
     }
 })
 
-//desc:     Data Upload
-//route:    Post /dashboard
-// router.post("/dashboard", (req, res) => {
-//     const { result } = req.body;
-//     console.log(result);
-// })
+// desc:     Data Upload
+// route:    Post /dashboard
+router.post("/dashboard", ensureAuthenticated, async (req, res) => {
+    try {
+        const { result } = req.body;
+
+
+        req.body.user = req.user.id;
+        req.body.testMsg = result;
+        await Data.create(req.body)
+        res.redirect("/dashboard")
+    } catch (err) {
+        console.error(err)
+        res.render("error/500")
+    }
+    //const { result } = req.body;
+    //console.log(result);
+})
 
 
 // Login
