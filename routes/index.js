@@ -35,7 +35,9 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
 router.post("/dashboard", ensureAuthenticated, async (req, res) => {
     try {
         const { result } = req.body;
+        //get public userIp
         const userAddress = await getExternalIP();
+        //get userIsp from publicIp        
 
         //preparing json
         jsonString = result;
