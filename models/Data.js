@@ -9,7 +9,7 @@ const DataSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    userIp: {
+    userIsp: {
         type: String
     },
     userJson: {
