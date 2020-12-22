@@ -4,7 +4,8 @@ const router = express.Router()
 const { ensureAuthenticated, ensureGuest } = require("../config/auth")
 const { getExternalIP } = require("../config/ipGet")
 const getUserIsp = require("../config/ispGet")
-const getUniqueIpCount = require("../config/uniqueIpGet")
+const getHeapMapData = require("../config/getHeatMapData")
+
 
 const Data = require("../models/Data")
 
@@ -19,14 +20,27 @@ router.get("/", ensureGuest, (req, res) => {
 router.get("/dashboard", ensureAuthenticated, async (req, res) => {
     try {
         const userData = await Data.find({ user: req.user.id }).lean()
-
-        res.render("dashboard", {
-            user: req.user,
-            layout: "layoutUser",
-            userData,
-            helper: require("../helpers/helper"),
-            title: "Express"
-        })
+        if (userData != "") {
+            // get heatmapData from scripts
+            const heatmapData = await getHeapMapData(req);
+            //console.log(heatmapData)
+            res.render("dashboard", {
+                user: req.user,
+                layout: "layoutUser",
+                userData,
+                heatmapData,
+                helper: require("../helpers/helper"),
+                title: "Express"
+            })
+        } else if (userData == "") {
+            res.render("dashboard", {
+                user: req.user,
+                layout: "layoutUser",
+                userData,
+                helper: require("../helpers/helper"),
+                title: "Express"
+            })
+        }
     } catch (err) {
         console.error(err)
         res.render("error/500")
@@ -38,12 +52,8 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
 router.post("/dashboard", ensureAuthenticated, async (req, res) => {
     try {
         // set upload to true for data upload
-        let upload = false;
+        let upload = true;
         const { result } = req.body;
-
-        // get Unique ips with counts for heatmap
-        const uniqueIp = await getUniqueIpCount(req);
-        console.log(uniqueIp);
 
         // get public userIp
         const userAddress = await getExternalIP();
@@ -66,6 +76,11 @@ router.post("/dashboard", ensureAuthenticated, async (req, res) => {
         if (upload) {
             await Data.create(docs)
         }
+
+        // // get heatmap data from scripts
+        // const heatmapData = await getHeapMapData(req);
+        // console.log(heatmapData);
+
         res.redirect("/dashboard")
     } catch (err) {
         console.error(err)
