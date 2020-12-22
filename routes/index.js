@@ -4,6 +4,7 @@ const router = express.Router()
 const { ensureAuthenticated, ensureGuest } = require("../config/auth")
 const { getExternalIP } = require("../config/ipGet")
 const getUserIsp = require("../config/ispGet")
+const getUniqueIpCount = require("../config/uniqueIpGet")
 
 const Data = require("../models/Data")
 
@@ -18,6 +19,7 @@ router.get("/", ensureGuest, (req, res) => {
 router.get("/dashboard", ensureAuthenticated, async (req, res) => {
     try {
         const userData = await Data.find({ user: req.user.id }).lean()
+
         res.render("dashboard", {
             user: req.user,
             layout: "layoutUser",
@@ -35,10 +37,17 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
 // route:    Post /dashboard
 router.post("/dashboard", ensureAuthenticated, async (req, res) => {
     try {
+        // set upload to true for data upload
+        let upload = false;
         const { result } = req.body;
-        //get public userIp
+
+        // get Unique ips with counts for heatmap
+        const uniqueIp = await getUniqueIpCount(req);
+        console.log(uniqueIp);
+
+        // get public userIp
         const userAddress = await getExternalIP();
-        //get userIsp from publicIp
+        // get userIsp from publicIp
         const userIsp = await getUserIsp(userAddress);
 
         //preparing json
@@ -53,7 +62,10 @@ router.post("/dashboard", ensureAuthenticated, async (req, res) => {
             };
             docs.push(entry);
         }
-        await Data.create(docs)
+
+        if (upload) {
+            await Data.create(docs)
+        }
         res.redirect("/dashboard")
     } catch (err) {
         console.error(err)
