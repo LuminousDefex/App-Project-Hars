@@ -39,8 +39,8 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
 router.post("/dashboard", ensureAuthenticated, async (req, res) => {
     try {
         // set upload to true for data upload
-        let upload = false;
-        let uploadGeo = false;
+        let upload = true;
+        let uploadGeo = true;
         const { result } = req.body;
 
         // get public userIp
@@ -69,7 +69,6 @@ router.post("/dashboard", ensureAuthenticated, async (req, res) => {
         const heatmapData = await getHeapMapData(req);
         let heatmapDataString = JSON.stringify(heatmapData);
         let entry = {
-            user: req.user.id,
             geoData: heatmapDataString
         }
         if (uploadGeo) {
