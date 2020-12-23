@@ -8,6 +8,7 @@ const getHeapMapData = require("../config/getHeatMapData")
 
 
 const Data = require("../models/Data")
+const GeoData = require("../models/GeoData")
 
 //desc:     Login/Landing page
 //route:    Get /
@@ -20,27 +21,13 @@ router.get("/", ensureGuest, (req, res) => {
 router.get("/dashboard", ensureAuthenticated, async (req, res) => {
     try {
         const userData = await Data.find({ user: req.user.id }).lean()
-        if (userData != "") {
-            // get heatmapData from scripts
-            const heatmapData = await getHeapMapData(req);
-            //console.log(heatmapData)
-            res.render("dashboard", {
-                user: req.user,
-                layout: "layoutUser",
-                userData,
-                heatmapData,
-                helper: require("../helpers/helper"),
-                title: "Express"
-            })
-        } else if (userData == "") {
-            res.render("dashboard", {
-                user: req.user,
-                layout: "layoutUser",
-                userData,
-                helper: require("../helpers/helper"),
-                title: "Express"
-            })
-        }
+        res.render("dashboard", {
+            user: req.user,
+            layout: "layoutUser",
+            userData,
+            helper: require("../helpers/helper"),
+            title: "Express"
+        })
     } catch (err) {
         console.error(err)
         res.render("error/500")
@@ -52,7 +39,8 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
 router.post("/dashboard", ensureAuthenticated, async (req, res) => {
     try {
         // set upload to true for data upload
-        let upload = true;
+        let upload = false;
+        let uploadGeo = false;
         const { result } = req.body;
 
         // get public userIp
@@ -77,9 +65,16 @@ router.post("/dashboard", ensureAuthenticated, async (req, res) => {
             await Data.create(docs)
         }
 
-        // // get heatmap data from scripts
-        // const heatmapData = await getHeapMapData(req);
-        // console.log(heatmapData);
+        // get heatmap data from scripts and upload to db
+        const heatmapData = await getHeapMapData(req);
+        let heatmapDataString = JSON.stringify(heatmapData);
+        let entry = {
+            user: req.user.id,
+            geoData: heatmapDataString
+        }
+        if (uploadGeo) {
+            await GeoData.create(entry);
+        }
 
         res.redirect("/dashboard")
     } catch (err) {
@@ -104,10 +99,6 @@ router.get("/logout", (req, res) => {
     req.flash("success_msg", "You are logged out");
     res.redirect("/");
 })
-
-
-
-
 
 
 module.exports = router

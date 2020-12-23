@@ -16,9 +16,9 @@ async function prepareHeatLayer(uniqueIp) {
         if (ips[ip] === max) {
             ips[ip] = ((ips[ip] - min) / (max - min)).toFixed(1);
         } else if (ips[ip] === min) {
-            ips[ip] = ((ips[ip] - min) / (max - min)).toFixed(1);
+            ips[ip] = 0.1;
         } else {
-            ips[ip] = ((ips[ip] - min) / (max - min)).toFixed(1);
+            ips[ip] = (parseFloat((ips[ip] - min) / (max - min)) + 0.1).toFixed(1);
         }
     }
     return ips

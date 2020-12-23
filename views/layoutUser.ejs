@@ -11,11 +11,19 @@
 
     <link rel="stylesheet" type="text/css" href="/css/usermainpage.css" />
     <link rel="shortcut icon" href="#" />
-
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css"
         integrity="sha384-vp86vTRFVJgpjF9jiIGPEEqYqlDwgyBgEF109VFjmqGmIY/Y4HV4d3Gp2irVfcrp" crossorigin="anonymous">
 
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+    <script src="/scripts/leaflet-heat.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+
 
 </head>
 
@@ -23,6 +31,7 @@
 
     <%- body %>
 
+        <script src="/scripts/map.js"></script>
         <script src="/scripts/download.js"></script>
         <script src="/scripts/har-mani.js"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

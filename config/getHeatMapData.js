@@ -10,8 +10,9 @@ async function getHeapMapData(req) {
     const prepareIp = await prepareIps(uniqueIp);
     // get Geolocation data from api
     const geoData = await getGeoData(prepareIp);
-    // finalize data for heatmap layer
+    // finalize data
     const finalGeoData = getFinalGeoData(geoData);
+
     return finalGeoData
 }
 
