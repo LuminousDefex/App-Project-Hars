@@ -21,13 +21,26 @@ router.get("/", ensureGuest, (req, res) => {
 router.get("/dashboard", ensureAuthenticated, async (req, res) => {
     try {
         const userData = await Data.find({ user: req.user.id }).lean()
-        res.render("dashboard", {
-            user: req.user,
-            layout: "layoutUser",
-            userData,
-            helper: require("../helpers/helper"),
-            title: "Express"
-        })
+        if (userData != "") {
+            const heatmapData = await getHeapMapData(req);
+            res.render("dashboard", {
+                user: req.user,
+                layout: "layoutUser",
+                userData,
+                heatmapData,
+                helper: require("../helpers/helper"),
+                title: "Express"
+            })
+        } else {
+            res.render("dashboard", {
+                user: req.user,
+                layout: "layoutUserNoScript",
+                userData,
+                helper: require("../helpers/helper"),
+                title: "Express"
+            })
+        }
+
     } catch (err) {
         console.error(err)
         res.render("error/500")
@@ -66,14 +79,14 @@ router.post("/dashboard", ensureAuthenticated, async (req, res) => {
         }
 
         // get heatmap data from scripts and upload to db
-        const heatmapData = await getHeapMapData(req);
-        let heatmapDataString = JSON.stringify(heatmapData);
-        let entry = {
-            geoData: heatmapDataString
-        }
-        if (uploadGeo) {
-            await GeoData.create(entry);
-        }
+        // const heatmapData = await getHeapMapData(req);
+        // let heatmapDataString = JSON.stringify(heatmapData);
+        // let entry = {
+        //     geoData: heatmapDataString
+        // }
+        // if (uploadGeo) {
+        //     await GeoData.create(entry);
+        // }
 
         res.redirect("/dashboard")
     } catch (err) {
