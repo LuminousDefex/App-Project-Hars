@@ -8,7 +8,6 @@ const getHeapMapData = require("../config/getHeatMapData")
 
 
 const Data = require("../models/Data")
-const GeoData = require("../models/GeoData")
 
 //desc:     Login/Landing page
 //route:    Get /
@@ -53,7 +52,6 @@ router.post("/dashboard", ensureAuthenticated, async (req, res) => {
     try {
         // set upload to true for data upload
         let upload = true;
-        let uploadGeo = true;
         const { result } = req.body;
 
         // get public userIp
@@ -77,16 +75,6 @@ router.post("/dashboard", ensureAuthenticated, async (req, res) => {
         if (upload) {
             await Data.create(docs)
         }
-
-        // get heatmap data from scripts and upload to db
-        // const heatmapData = await getHeapMapData(req);
-        // let heatmapDataString = JSON.stringify(heatmapData);
-        // let entry = {
-        //     geoData: heatmapDataString
-        // }
-        // if (uploadGeo) {
-        //     await GeoData.create(entry);
-        // }
 
         res.redirect("/dashboard")
     } catch (err) {
