@@ -45,13 +45,14 @@
             <!--Right small collum-->
             <div class="col">
                 <hr class="my-4">
-                <p class="lead" style="margin-bottom: 0%;">Username: <b>
+                <p class="lead" style="padding-bottom: 2px;">Username: <b>
                         <%= user.name%>
                     </b></p>
-                <p class="lead" id="lastupload" style="padding-top: 5px;">Last upload: <%= helper.checkDate(userData) %>
+                <p class="lead" id="entries" style="padding-top: 2px;">Number of Entries: <%= userData.length %></p>
+                <p class="lead" id="lastupload" style="padding-top: 2px;">Last upload: <%= helper.checkDate(userData) %>
                 </p>
                 <a href="">Αλλαγή username</a>
-                <p class="lead" style="padding-top: 5px;  margin-bottom: 0%;"></p><br>
+                <p class="lead" style="padding-top: 2px;  margin-bottom: 0%;"></p><br>
                 <a href="">Αλλαγή password</a>
                 <p></p>
                 <a href="/logout" class="btn btn-secondary">Logout</a>
