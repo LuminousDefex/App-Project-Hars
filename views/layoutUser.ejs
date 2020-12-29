@@ -34,10 +34,10 @@
     // script for map data
     <script>
 
-        heatmapData = <%- JSON.stringify(heatmapData) %>
+        heatmapDataCleaned = <%- JSON.stringify(heatmapDataCleaned) %>
         heatmapDataArray = []
-        for (let i = 0; i < heatmapData.length; i++) {
-            heatmapDataArray.push(Object.values(heatmapData[i]));
+        for (let i = 0; i < heatmapDataCleaned.length; i++) {
+            heatmapDataArray.push(Object.values(heatmapDataCleaned[i]));
         }
     
         var map = L.map('userMap').setView([39.0742, 21.8243], 6);

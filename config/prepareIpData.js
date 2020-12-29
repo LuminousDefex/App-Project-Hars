@@ -1,7 +1,7 @@
 const axios = require("axios")
 
 async function prepareHeatLayer(uniqueIp) {
-    let ips = uniqueIp[0]
+    let ips = uniqueIp
 
     // remove entries with no ip
     delete ips[""]
