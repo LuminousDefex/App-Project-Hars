@@ -36,3 +36,5 @@ html, body, #intro {
     margin-bottom: 50px;
     border: 5px solid grey;
 }
+
+.show-onclick { display: none; }

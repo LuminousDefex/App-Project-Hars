@@ -8,6 +8,7 @@ const getHeapMapData = require("../config/getHeatMapData")
 const cleanupHeatData = require("../config/cleanupHeat")
 
 
+const User = require("../models/User")
 const Data = require("../models/Data")
 const Heat = require("../models/Heat")
 
@@ -122,5 +123,20 @@ router.get("/logout", (req, res) => {
     res.redirect("/");
 })
 
+router.post("/update-name", async function (req, res) {
+    try {
+        let id = req.user.id;
+        let username = req.body.name;
+
+        let userFromDb = await User.findOne({ _id: id })
+        userFromDb.name = username;
+        await userFromDb.save();
+
+        res.redirect("/dashboard");
+    } catch (err) {
+        console.error(err)
+        res.render("error/500");
+    }
+});
 
 module.exports = router
