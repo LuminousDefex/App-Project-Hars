@@ -123,7 +123,7 @@ router.get("/logout", (req, res) => {
     res.redirect("/");
 })
 
-router.post("/update-name", async function (req, res) {
+router.post("/update-name", ensureAuthenticated, async function (req, res) {
     try {
         let id = req.user.id;
         let username = req.body.name;
