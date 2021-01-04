@@ -128,6 +128,11 @@ router.post("/update-name", async function (req, res) {
         let id = req.user.id;
         let username = req.body.name;
 
+        let userCheck = await User.findOne({ name: username });
+        if (userCheck != null) {
+            throw "Error! UserName already in Use";
+        }
+
         let userFromDb = await User.findOne({ _id: id })
         userFromDb.name = username;
         await userFromDb.save();
@@ -135,7 +140,7 @@ router.post("/update-name", async function (req, res) {
         res.redirect("/dashboard");
     } catch (err) {
         console.error(err)
-        res.render("error/500");
+        res.render("error/usernameChangeError")
     }
 });
 
