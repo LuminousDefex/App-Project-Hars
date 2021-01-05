@@ -6,6 +6,7 @@ const { getExternalIP } = require("../config/ipGet")
 const getUserIsp = require("../config/ispGet")
 const getHeapMapData = require("../config/getHeatMapData")
 const cleanupHeatData = require("../config/cleanupHeat")
+const bcrypt = require("bcryptjs")
 
 
 const User = require("../models/User")
@@ -143,5 +144,35 @@ router.post("/update-name", ensureAuthenticated, async function (req, res) {
         res.render("error/usernameChangeError")
     }
 });
+
+router.post("/update-pass", async (req, res) => {
+    const { pass, pass2 } = req.body;
+    let err = "";
+    try {
+        //check passwords match
+        if (pass !== pass2) {
+            err = "passwords dont match";
+            throw err;
+        }
+
+        //check passlength
+        if (pass.length < 8) {
+            err = "password of invalid length";
+            throw err;
+        }
+
+        let userFromDb = await User.findOne({ _id: req.user.id })
+        await bcrypt.hash(pass, 10, async function (err, hash) {
+            userFromDb.password = hash;
+            await userFromDb.save();
+        });
+
+        res.redirect("/dashboard");
+
+    } catch (err) {
+        console.error(err);
+        res.redirect("/dashboard");
+    }
+})
 
 module.exports = router

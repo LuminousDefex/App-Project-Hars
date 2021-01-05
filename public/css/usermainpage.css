@@ -37,4 +37,6 @@ html, body, #intro {
     border: 5px solid grey;
 }
 
-.show-onclick { display: none; }
+.show-onclick-user { display: none; }
+
+.show-onclick-pass { display: none; }
