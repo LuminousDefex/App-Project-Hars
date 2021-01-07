@@ -1,17 +1,18 @@
 const express = require("express")
 const passport = require("passport")
 const router = express.Router()
-const { ensureAuthenticated, ensureGuest } = require("../config/auth")
+const { ensureAuthenticated, ensureGuest, ensureAdmin } = require("../config/auth")
 const { getExternalIP } = require("../config/ipGet")
 const getUserIsp = require("../config/ispGet")
 const getHeapMapData = require("../config/getHeatMapData")
 const cleanupHeatData = require("../config/cleanupHeat")
 const bcrypt = require("bcryptjs")
+const agg = require("../config/agg")
 
 
-const User = require("../models/User")
 const Data = require("../models/Data")
 const Heat = require("../models/Heat")
+const User = require("../models/User")
 
 //desc:     Login/Landing page
 //route:    Get /
@@ -46,11 +47,135 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
                 title: "Express"
             })
         }
-
     } catch (err) {
         console.error(err)
         res.render("error/500")
     }
+})
+
+//desc:     Admin Dashboard
+//route:    Get /admin_dashboard
+router.get("/adminDashboard", ensureAdmin, ensureAuthenticated, async (req, res) => {
+    try {
+        const methodTypesCount = await Data.aggregate([
+            {
+                "$group": {
+                    "_id": "$userJson.method",
+                    "count": { "$sum": 1 }
+                }
+            },
+            {
+                "$group": {
+                    "_id": null,
+                    "counts": {
+                        "$push": { "k": { "$toString": "$_id" }, "v": "$count" }
+                    }
+                }
+            },
+            {
+                "$replaceRoot": {
+                    "newRoot": { "$arrayToObject": "$counts" }
+                }
+            }
+        ]);
+        const statusTypesCount = await Data.aggregate([
+            {
+                "$group": {
+                    "_id": "$userJson.status",
+                    "count": { "$sum": 1 }
+                }
+            },
+            {
+                "$group": {
+                    "_id": null,
+                    "counts": {
+                        "$push": { "k": { "$toString": "$_id" }, "v": "$count" }
+                    }
+                }
+            },
+            {
+                "$replaceRoot": {
+                    "newRoot": { "$arrayToObject": "$counts" }
+                }
+            }
+        ]);
+        const domainTypesCount = await Data.aggregate([
+            {
+                "$group": {
+                    "_id": "$userJson.url",
+                    "count": { "$sum": 1 }
+                }
+            },
+            {
+                "$group": {
+                    "_id": null,
+                    "counts": {
+                        "$push": { "k": { "$toString": "$_id" }, "v": "$count" }
+                    }
+                }
+            },
+            {
+                "$replaceRoot": {
+                    "newRoot": { "$arrayToObject": "$counts" }
+                }
+            }
+        ]);
+        const ispTypesCount = await Data.aggregate([
+            {
+                "$group": {
+                    "_id": "$userIsp",
+                    "count": { "$sum": 1 }
+                }
+            },
+            {
+                "$group": {
+                    "_id": null,
+                    "counts": {
+                        "$push": { "k": { "$toString": "$_id" }, "v": "$count" }
+                    }
+                }
+            },
+            {
+                "$replaceRoot": {
+                    "newRoot": { "$arrayToObject": "$counts" }
+                }
+            }
+        ]);
+
+        // -- Aggregation for Content Type
+        let distinctContentType = await Data.distinct("userJson.Content-Type").lean()
+        distinctContentType.shift();
+        const avgPerContentTypeArr = await agg(distinctContentType);
+        // --
+
+        const numOfUsers = await User.countDocuments();
+        const userData = await Data.find({ user: req.user.id }).lean()
+        res.render("adminDashboard", {
+            user: req.user,
+            layout: "layoutAdmin",
+            userData,
+            numOfUsers,
+            methodTypesCount,
+            statusTypesCount,
+            domainTypesCount,
+            ispTypesCount,
+            distinctContentType,
+            avgPerContentTypeArr,
+            resultContent: JSON.stringify(avgPerContentTypeArr),
+            helper: require("../helpers/helper"),
+            title: "Express"
+        })
+    } catch (err) {
+        console.error(err)
+        res.render("error/500admin")
+    }
+})
+
+
+//desc:     Admin Login Page
+//route:    Get /adminlogin
+router.get("/adminlogin", ensureGuest, (req, res) => {
+    res.render("adminlogin")
 })
 
 // desc:     Data Upload
@@ -108,7 +233,7 @@ router.post("/dashboard", ensureAuthenticated, async (req, res) => {
 })
 
 
-// Login
+// Login User
 router.post("/", (req, res, next) => {
     passport.authenticate("local", {
         successRedirect: "/dashboard",
@@ -117,12 +242,14 @@ router.post("/", (req, res, next) => {
     })(req, res, next);
 });
 
-// Logout
-router.get("/logout", (req, res) => {
-    req.logout();
-    req.flash("success_msg", "You are logged out");
-    res.redirect("/");
-})
+// Login Admin
+router.post("/adminlogin", (req, res, next) => {
+    passport.authenticate("local", {
+        successRedirect: "/adminDashboard",
+        failureRedirect: "/",
+        failureFlash: true
+    })(req, res, next);
+});
 
 router.post("/update-name", ensureAuthenticated, async function (req, res) {
     try {
@@ -174,5 +301,14 @@ router.post("/update-pass", async (req, res) => {
         res.redirect("/dashboard");
     }
 })
+
+
+// Logout
+router.get("/logout", (req, res) => {
+    req.logout();
+    req.flash("success_msg", "You are logged out");
+    res.redirect("/");
+})
+
 
 module.exports = router
