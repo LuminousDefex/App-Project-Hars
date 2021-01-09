@@ -244,6 +244,7 @@ router.post("/dashboard", ensureAuthenticated, async (req, res) => {
             let entry = {
                 user: req.user.id,
                 userIsp: userIsp,
+                userIp: userAddress,
                 userJson: myJson[i]
             };
             docs.push(entry);
