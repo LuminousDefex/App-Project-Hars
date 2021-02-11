@@ -10,11 +10,13 @@ const bcrypt = require("bcryptjs")
 const agg = require("../config/agg")
 const aggMethod = require("../config/aggMethod")
 const aggIsp = require("../config/aggIsp")
+var ObjectId = require('mongodb').ObjectID;
 
 
 const Data = require("../models/Data")
 const Heat = require("../models/Heat")
 const User = require("../models/User")
+const { default: axios } = require("axios")
 
 //desc:     Login/Landing page
 //route:    Get /
@@ -212,6 +214,45 @@ router.get("/adminDashboard", ensureAdmin, ensureAuthenticated, async (req, res)
         })
     } catch (err) {
         console.error(err)
+        res.render("error/500admin")
+    }
+})
+
+//desc:     Admin Dashboard
+//route:    Get /admin_dashboard
+router.get("/adminDashboardMap", ensureAdmin, ensureAuthenticated, async (req, res) => {
+    try {
+        let userIp = await Data.distinct("userIp");
+        let mainUserIp = userIp[0];
+        let userLatLong = await axios.get(`http://ip-api.com/json/${mainUserIp}?fields=lat,lon`)
+        userLatLong = userLatLong.data;
+
+        let userId = await User.find({ name: "defex" });
+        userId = userId[0]._id;
+
+        let ipLatLong = await Heat.aggregate([
+            {
+                "$match": {
+                    user: ObjectId(`${userId}`)
+                }
+            }
+        ])
+        for (entry of ipLatLong) {
+            delete entry["_id"];
+            delete entry["user"];
+            delete entry["__v"];
+        }
+
+        res.render("adminDashboardMap", {
+            layout: "layoutAdminMap",
+            user: req.user,
+            userLatLong: JSON.stringify(userLatLong),
+            ipLatLong: JSON.stringify(ipLatLong),
+            helper: require("../helpers/helper"),
+            title: "Express"
+        })
+    } catch (err) {
+        console.error(err);
         res.render("error/500admin")
     }
 })
