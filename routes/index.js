@@ -280,6 +280,7 @@ router.post("/dashboard", ensureAuthenticated, async (req, res) => {
         //preparing json
         jsonString = result;
         myJson = JSON.parse(jsonString);
+        // batching 
         const docs = []; // {user: , userJson: {}}
         for (let i = 0; i < myJson.length; i++) {
             let entry = {
