@@ -1,4 +1,4 @@
-Web Project - Ceid 2020/2021
+Web Project - Ceid 2020/2021 updated version
 
 Svino node_modules gia clean install
 
